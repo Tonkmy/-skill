@@ -1,0 +1,8 @@
+% Writing-phase markers for research-story-writing.
+% \input{writing-macros} in the preamble, after the template's own packages.
+% They render in color so open items stay visible in the PDF.
+% Before submission none of them may remain in the text (pipeline step 8).
+\usepackage{xcolor}
+\newcommand{\missing}[1]{\textcolor{red}{[MISSING: #1]}}
+\newcommand{\citeneeded}[1]{\textcolor{red}{[CITE NEEDED: #1]}}
+\newcommand{\plannernote}[1]{\textcolor{blue}{[NOTE: #1]}}

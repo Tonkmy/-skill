@@ -6,7 +6,7 @@
 
 | 文件夹 / 文件 | 用途 | 何时用 |
 |---|---|---|
-| [`research-story-writing/`](research-story-writing/) | 科研论文 / final report 双 agent 写作工作流（故事优先、分节派发、去 AI 腔、三镜头对抗审查） | 写或改论文、章节、课程 final report；提到合著者写作、storyline、去 AI 腔 |
+| [`research-story-writing/`](research-story-writing/) | 科研论文 / 学位论文 / final report 多 agent 写作工作流（故事优先、LaTeX 直写、规则配置、claim 登记、分节派发与冷读验收、事实审计、去 AI 腔、对抗审查） | 写或改论文、章节、课程 final report；提到合著者写作、storyline、去 AI 腔 |
 | [`report_style_guide.md`](report_style_guide.md) | 实验报告整理风格指南（表格叙事、设定→表→发现） | 重写/新写实验报告，要短、结构化、少 prose |
 
 ## 安装到 Cursor
@@ -33,16 +33,21 @@ cp -R -skill/research-story-writing /path/to/your-repo/.cursor/skills/
 
 - 「用 research-story-writing skill，按它启动论文写作 planner」
 - 「按 research-story-writing 做去 AI 腔打磨 + 三镜头对抗审查」
+- 已有项目续写：「读 writing/startprompt.md，按它启动」
 
 入口说明见 [`research-story-writing/SKILL.md`](research-story-writing/SKILL.md)。同目录还有：
 
 - `section-prompt-template.md` — 分节写作 prompt 模板
-- `polish-and-review.md` — 风格打磨与对抗审查
-- `project-instance.md` — 一次成功实例的文件指针（可按新项目改写）
+- `acceptance-and-audit.md` — 冷读验收（反向大纲、首句、5 分钟测试）与数字 / 引用 / claim 审计
+- `polish-and-review.md` — 章节与全文对抗审查、去 AI 腔打磨、收敛
+- `paper-archetypes.md` — 论文原型卡与从范文蒸馏的流程
+- `templates/` — 启动时拷进项目的文件（规则配置、claims、storyline、术语、来源、台账、启动 prompt、LaTeX 标记宏）
+- `examples/dmd-final-report.md` — 最初那次 final report 的文件指针
+- `TODO.md` — 暂缓的模块（成稿后高强度审稿、rebuttal 等）
 
 ## 新增 skill 约定
 
 1. 新建 `kebab-case/` 文件夹
 2. 必有 `SKILL.md`（YAML frontmatter：`name` + `description`）
-3. 细节放到同级 `*.md`，由 `SKILL.md` 一层链接
+3. 细节放到同级 `*.md`，由 `SKILL.md` 一层链接；模板和示例可放 `templates/`、`examples/` 子目录
 4. 更新本 README 的「目录」表

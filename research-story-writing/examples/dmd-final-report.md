@@ -1,6 +1,18 @@
-# Project instance: Wan2.1-T2V DMD distillation report
+# Example: Wan2.1-T2V DMD distillation final report
 
-Canonical artifacts from the 2026-07-28…31 final-report run. Prefer these over chat memory when working in that repo.
+Canonical artifacts from the 2026-07-28…31 final-report run that this skill was first distilled from. All paths below live in that project's repository, not in this skill repo. Prefer these over chat memory when working in that project.
+
+That run predates the `templates/` layout and wrote Markdown first, converting to LaTeX at the end; the skill now writes LaTeX from the start. Its files map onto the current templates like this:
+
+| That run | Current template |
+|---|---|
+| `research/writing_phase_startprompt.md` | `writing/startprompt.md` |
+| `research/report_storyline_0728.md`, `research/final_report_plan.md` | `writing/storyline.md` |
+| `research/T3_novelty_adjudication.md` | `writing/claims.md` (closest work, red lines) |
+| `research/presentation_wording_guide.md`, `research/writing_en_conventions.md` | `writing/wording.md` |
+| `research/verified_citations.md`, dated result notes | `writing/sources.md` |
+| `experiments/results/acceptance-log.md` | `writing/ledger.md` |
+| Hard lines below | `writing/config.md` → 项目红线 |
 
 ## Startup prompts (paste into a new agent)
 
