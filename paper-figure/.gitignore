@@ -1,0 +1,10 @@
+# Per-paper profiles hold unpublished work: keep them local
+projects/*
+!projects/_template.md
+
+# Regenerable render outputs (keep specimen.pptx and its slide PNGs)
+examples/*.pdf
+examples/*.svg
+examples/demo_plot.png
+
+__pycache__/
