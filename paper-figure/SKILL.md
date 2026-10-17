@@ -24,7 +24,7 @@ description: >-
 ## 工作流
 
 0. **定位**：这张图在哪一节、支撑哪句话（写成"读者 5 秒内要看懂：……"）、放单栏还是通栏。画布宽度用 `tokens.frame_width(slot)`；IEEE 单栏 5.67 in，通栏 11.67 in，打印比例统一 0.6。
-1. **结构稿**：先不画。列出模块、信息流、语义分组、唯一的高亮对象和要出现的记号，画一个 ASCII 线框给用户确认。改已有图的小修可以跳过这步。
+1. **结构稿**：先读懂论文，再从「读者需要知道什么」出发构图，不照抄原文写法（规则 7）。列出模块（各自是什么、干什么用）、信息流、语义分组、唯一的高亮对象和要出现的记号，画一个 ASCII 线框给用户确认。改已有图的小修可以跳过这步。
 2. **画**：在论文的作图工作区写一个 build 脚本（不放进 skill），用 `scripts/figkit.py` 生成 pptx。数据图用 `scripts/plot_style.py` 出 PNG，再用 `fig.picture()` 按 1:1 插入。
 3. **自查**：
    - 运行 `python render.py deck.pptx -o out --frame`，用 Read 逐页看 PNG。
@@ -37,6 +37,7 @@ description: >-
      3. 同目录留一份 `<名字>.before-<改动>.pptx` 备份；
      4. 写入后用 C14N 比对 XML，确认原有页面在语义上没有变化。
    - 没有指定工作区时，另存为带版本号的新文件（如 `<名字>_v1017.pptx`）。
+   - 每页用 `fig.note()` 在右下角（FRAME 外，导出时不会带上）写清：这张图表达什么、放在论文哪一节、替换哪个文件（用户 2026-10-17 的要求）。
    - 附上渲染 PNG 和 3–5 行说明：改了什么，哪些需要用户拍板。
    - 最终效果以 PowerPoint 为准。用户在 PowerPoint 里"另存为 PDF"后，运行 `python render.py that.pdf --pptx deck.pptx -o out --frame`，把每张图裁成单独的 PDF。
    - LaTeX 里按 `width=\columnwidth` 或 `\textwidth` 插入，不再额外缩放。
@@ -57,6 +58,8 @@ fig.path([p1, p2, p3], dashed=True)             # 折线（训练专用关系用
 fig.group(x, y, w, h, "Frozen backbone")        # 语义分组底框，自动置底
 fig.op(x, y, "+", role="violet")                # 运算节点 ⊕
 fig.vector(x, y, n=4, role="orange")            # 向量 / 嵌入图标
+fig.stack(x, y, w, h, n=3, text="1")            # CNN stage：特征图堆叠
+fig.note("图 1 · …\n表达：…\n位置：…")            # FRAME 外的说明（中文可）
 fig.icon("snowflake", x, y)                     # 冻结；"flame" = 可训练
 fig.text(x, y, w, h, "$z_p = α e_0$")           # 标签；$…$ 里字母斜体，_ 下标，^ 上标
 fig.title(x, y, "(a)", "Shared architecture")   # 面板标题

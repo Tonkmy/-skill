@@ -79,15 +79,15 @@ GRAY = {
     "white": "FFFFFF",
 }
 
-ACCENTS = {
-    "orange": {"fill": "FFE8CC", "line": "FD7E14", "text": "D9480F", "glow": "FFC078"},
-    "blue": {"fill": "D0EBFF", "line": "228BE6", "text": "1864AB", "glow": "74C0FC"},
-    "violet": {"fill": "E5DBFF", "line": "7950F2", "text": "5F3DC4", "glow": "B197FC"},
-    "green": {"fill": "D3F9D8", "line": "40C057", "text": "2B8A3E", "glow": "8CE99A"},
-    "red": {"fill": "FFE3E3", "line": "FA5252", "text": "C92A2A", "glow": "FFA8A8"},
+ACCENTS = {  # bg = shade 0, for large containers so colour stays light
+    "orange": {"bg": "FFF4E6", "fill": "FFE8CC", "line": "FD7E14", "text": "D9480F", "glow": "FFC078"},
+    "blue": {"bg": "E7F5FF", "fill": "D0EBFF", "line": "228BE6", "text": "1864AB", "glow": "74C0FC"},
+    "violet": {"bg": "F3F0FF", "fill": "E5DBFF", "line": "7950F2", "text": "5F3DC4", "glow": "B197FC"},
+    "green": {"bg": "EBFBEE", "fill": "D3F9D8", "line": "40C057", "text": "2B8A3E", "glow": "8CE99A"},
+    "red": {"bg": "FFF5F5", "fill": "FFE3E3", "line": "FA5252", "text": "C92A2A", "glow": "FFA8A8"},
 }
 
-ROLE_BASE = {"fill": GRAY["fill"], "line": GRAY["border"], "text": GRAY["text"], "glow": GRAY["guide"]}
+ROLE_BASE = {"bg": GRAY["bg"], "fill": GRAY["fill"], "line": GRAY["border"], "text": GRAY["text"], "glow": GRAY["guide"]}
 
 
 def role(name):

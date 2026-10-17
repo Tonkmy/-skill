@@ -458,6 +458,69 @@ class Figure:
         h = cell if horizontal else n * cell + (n - 1) * gap
         return Node(grp, x, y, w, h)
 
+    def stack(self, x, y, w, h, n=3, dx=0.045, dy=0.045, role="base", text=None, fill=None, name=None,
+              radius=0.04, text_size="note"):
+        """Feature-map stack that reads as a CNN stage: n offset cards, back cards up and to the right.
+        (x, y) is the top-left of the whole footprint (w + dx*(n-1) wide, h + dy*(n-1) tall).
+        Returns the front card as the Node, so arrows attach to it."""
+        c = T.role(role)
+        grp = self.shapes.add_group_shape()
+        front = None
+        for k in range(n - 1, -1, -1):  # back to front
+            cx, cy = x + dx * k, y + dy * (n - 1 - k)
+            s = grp.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, *self._xy(cx, cy), _emu(w), _emu(h))
+            _strip_style(s)
+            s.adjustments[0] = min(0.5, radius / min(w, h))
+            _set_fill(s, fill if fill is not None else c["fill"])
+            _set_line(s, c["line"], T.LINE["border"])
+            _effects(s)
+            front = s
+        if text:
+            fill_text(front.text_frame, text, text_size, "medium", "text" if role in (None, "base") else f"{role}.text",
+                      "center", "middle", pad=0.0)
+        grp.name = name or f"stack: {text or role}"
+        return Node(front, x, y + dy * (n - 1), w, h)
+
+    def note(self, content, w=None):
+        """Working note for the user, outside the FRAME (never exported): what the figure says and where
+        it goes in the paper. Sits right of the frame when there is room, otherwise below it, and is
+        bottom-right aligned on the slide. Chinese text falls back to PingFang SC."""
+        sw, sh = self.deck.prs.slide_width / EMU_IN, self.deck.prs.slide_height / EMU_IN
+        right_room = sw - (self.ox + self.width) - 0.3
+        below_room = sh - (self.oy + self.height) - 0.3
+        if w is None:
+            w = min(3.4, right_room) if right_room >= 2.2 else min(6.0, sw - 0.3)
+        per_line = max(8, int(w * 72 / 11 * 0.95))  # ~CJK characters per line at 11 pt
+        n = sum(max(1, -(-len(line) // per_line)) for line in content.split("\n"))
+        h = 0.19 * n + 0.2
+        if right_room >= w:
+            x, y = sw - w - 0.15, sh - h - 0.15
+        else:
+            x, y = sw - w - 0.15, max(self.oy + self.height + 0.15, sh - h - 0.15)
+            if y + h > sh:
+                print(f"warning: note on '{self.name}' does not fit outside the frame ({below_room:.2f} in below)")
+        tb = self.shapes.add_textbox(_emu(x), _emu(y), _emu(w), _emu(h))
+        tf = tb.text_frame
+        tf.word_wrap = True
+        tf.auto_size = MSO_AUTO_SIZE.NONE
+        tf.vertical_anchor = MSO_ANCHOR.TOP
+        for i, line in enumerate(content.split("\n")):
+            p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+            r = p.add_run()
+            r.text = line
+            f = r.font
+            f.name, f.size, f.bold = "Inter", Pt(11), i == 0
+            f.color.rgb = _rgb(T.GRAY["text"] if i == 0 else T.GRAY["muted"])
+            rpr = r._r.get_or_add_rPr()
+            for tag, face in (("a:ea", "PingFang SC"), ("a:cs", "Inter")):
+                el = rpr.find(qn(tag))
+                if el is None:
+                    el = etree.SubElement(rpr, qn(tag))
+                el.set("typeface", face)
+        _set_fill(tb, "bg")
+        tb.name = "NOTE (not exported)"
+        return tb
+
     # -- icons and pictures
     def icon(self, kind, x, y, size=0.26, color=None):
         """'snowflake' (frozen, grey by default) or 'flame' (trainable, orange by default)."""

@@ -45,6 +45,9 @@ plt.rcParams.update({
     "mathtext.it": "Inter:italic",
     "mathtext.bf": "Inter:bold",
     "mathtext.sf": "Inter",
+    "mathtext.cal": "Inter:italic",
+    "mathtext.tt": "Inter",
+    "mathtext.fallback": "stixsans",  # missing symbols stay sans-serif (rule 3)
     "text.color": TEXT,
     "axes.titlesize": T.SIZE["title"],
     "axes.titleweight": "semibold",

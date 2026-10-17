@@ -149,10 +149,17 @@ def shape_info(s, theme):
     return info
 
 
+_PALETTE = {v.upper(): name for name, shades in T.ACCENTS.items() for v in shades.values()}
+_PALETTE.update({v.upper(): None for v in T.GRAY.values()})
+
+
 def hue_family(hex_):
-    """Hue name of a colour, or None for neutrals. Uses HLS saturation so pale tints still count."""
+    """Accent name for house-palette colours; otherwise a hue name, or None for neutrals
+    (HLS saturation, so pale tints still count)."""
     if not hex_ or len(hex_) != 6:
         return None
+    if hex_.upper() in _PALETTE:
+        return _PALETTE[hex_.upper()]
     r, g, b = (int(hex_[i:i + 2], 16) / 255 for i in (0, 2, 4))
     h, l, s = colorsys.rgb_to_hls(r, g, b)
     if max(r, g, b) - min(r, g, b) < 0.03 or s < 0.25:
@@ -163,7 +170,7 @@ def hue_family(hex_):
 
 def sentence_like(t):
     t = " ".join(t.split())
-    words = re.findall(r"[A-Za-z一-鿿]+", t)
+    words = [w for w in re.findall(r"[A-Za-z一-鿿]+", t) if len(w) > 1]  # skip math variables
     # a sentence boundary is ". " + capital; "Aux. tail" (abbreviation + lower case) is a label
     return len(words) > 6 or bool(re.search(r"[a-z]\.\s+[A-Z]", t)) or (t.endswith(".") and not re.search(r"\d\.$", t))
 
@@ -178,7 +185,7 @@ def audit_slide(slide, idx, theme):
             if isinstance(r["color"], str) and r["color"].startswith("scheme:"):
                 r["color"] = theme.get(r["color"], r["color"])
     frame = next((x for x in shapes if x["name"].startswith("FRAME")), None)
-    shapes = [x for x in shapes if not x["name"].startswith("FRAME")]
+    shapes = [x for x in shapes if not x["name"].startswith(("FRAME", "NOTE"))]  # notes are not exported
     rows, facts = [], {}
     facts["frame"] = frame["name"] if frame else "（无 FRAME：整页即图）"
     facts["pictures"] = sum(1 for x in shapes if x["kind"] == MSO_SHAPE_TYPE.PICTURE)
