@@ -73,7 +73,8 @@ def parse_rich(s):
     """Split text into runs: [(text, {'italic': bool, 'baseline': 0|-25|30})].
 
     Outside $...$ text is upright. Inside, letters are italic; _x / _{..} is a subscript and
-    ^x / ^{..} a superscript; multi-letter scripts (cls, mimic) stay upright like \\text{}.
+    ^x / ^{..} a superscript. In scripts single letters are italic (r^{p−1}: p italic, −1 upright)
+    and words stay upright like \\text{} (L_{floor}).
     """
     runs = []
     for i, part in enumerate(re.split(r"(\$[^$]*\$)", s)):
@@ -93,8 +94,9 @@ def parse_rich(s):
                     script, j = m[j + 2:k], k + 1
                 else:
                     script, j = m[j + 1], j + 2
-                letters = re.sub(r"[^A-Za-z" + _GREEK + "]", "", script)
-                runs.append((script, {"italic": len(letters) <= 1 and len(script) <= 2 and bool(letters), "baseline": base}))
+                for tok in re.findall(r"[A-Za-z" + _GREEK + r"]+|[^A-Za-z" + _GREEK + r"]+", script):
+                    is_word = tok[0].isalpha() or tok[0] in _GREEK
+                    runs.append((tok, {"italic": is_word and len(tok) == 1, "baseline": base}))
                 continue
             k = j
             is_letter = ch.isalpha() or ch in _GREEK
@@ -302,9 +304,10 @@ class Figure:
     # -- modules
     def box(self, x, y, w, h, text=None, role="base", emphasis=False, size="module", weight="medium",
             text_color=None, fill=None, line=None, dashed=False, align="center", anchor="middle",
-            pad=None, name=None, radius=None, wrap=False):
+            pad=None, name=None, radius=None, wrap=False, sub=None):
         """Rounded module. role='base' is grey (existing / frozen); an accent role marks novelty;
-        emphasis=True adds the thicker accent outline and a soft glow (use on 1-2 modules)."""
+        emphasis=True adds the thicker accent outline and a soft glow (use on 1-2 modules).
+        sub: optional second line in the note size (a short descriptor, e.g. 'stages 3–4 · head')."""
         x, y, w, h = snap(x), snap(y), snap(w), snap(h)
         c = T.role(role)
         shp = self.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, *self._xy(x, y), _emu(w), _emu(h))
@@ -318,6 +321,12 @@ class Figure:
         if text is not None:
             col = text_color or ("text" if role in (None, "base") else f"{role}.text")
             fill_text(shp.text_frame, text, size, weight, col, align, anchor, pad, wrap)
+            if sub:
+                p = shp.text_frame.add_paragraph()
+                p.alignment = _ALIGN[align]
+                sub_col = "muted" if role in (None, "base") else f"{role}.text"
+                for t, st in parse_rich(sub):
+                    _style_run(p.add_run(), t, st, "note", "regular", sub_col)
         shp.name = name or f"box: {(text or '').splitlines()[0] if text else role}"
         return Node(shp, x, y, w, h)
 
@@ -507,7 +516,7 @@ class Figure:
         if border:
             _set_line(pic, border, T.LINE["border"])
         pic.name = name or f"picture: {os.path.basename(path)}"
-        return Node(pic, x, y, pic.width / EMU_IN, pic.height / EMU_IN)
+        return Node(pic, snap(x), snap(y), pic.width / EMU_IN, pic.height / EMU_IN)
 
     # -- legend
     def legend(self, x, y, items, gap=0.45, size="note"):
@@ -548,15 +557,34 @@ class Deck:
         layouts = self.prs.slide_layouts
         self._blank = min(layouts, key=lambda l: len(l.placeholders))
 
-    def figure(self, slot="full", height=4.0, name="figure", width=None):
+    def figure(self, slot="full", height=4.0, name="figure", width=None, origin=None, notes=None):
+        """Add one slide holding one figure. origin='center' centres the export frame on the
+        slide (useful in an existing deck with large slides); notes go to the speaker notes."""
         width = width or T.frame_width(slot, self.venue)
         slide = self.prs.slides.add_slide(self._blank)
         for ph in list(slide.placeholders):
             ph._element.getparent().remove(ph._element)
         self._max_h = max(self._max_h, height)
-        return Figure(self, slide, slot, width, height, name)
+        fig = Figure.__new__(Figure)
+        fig.deck, fig.slide, fig.slot, fig.name, fig.width, fig.height = self, slide, slot, name, width, height
+        fig.ox, fig.oy = 0.0, 0.0
+        if origin == "center":
+            fig.ox = snap((self.prs.slide_width / EMU_IN - width) / 2)
+            fig.oy = snap((self.prs.slide_height / EMU_IN - height) / 2)
+        elif origin:
+            fig.ox, fig.oy = origin
+        fig._frame = fig._add_frame()
+        if notes:
+            slide.notes_slide.notes_text_frame.text = notes
+        return fig
 
-    def save(self, path):
+    def save(self, path, force=False):
+        """Write the deck. Refuses when Office has the target open (a ~$ lock file sits next to it):
+        a later save in PowerPoint would silently drop these slides."""
+        lock = os.path.join(os.path.dirname(os.path.abspath(path)), "~$" + os.path.basename(path))
+        if os.path.exists(lock) and not force:
+            raise RuntimeError(f"{os.path.basename(path)} is open in PowerPoint ({lock} exists): "
+                               "ask the user to save and close it first")
         if self._auto_height:
             self.prs.slide_height = _emu(snap(self._max_h))
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)

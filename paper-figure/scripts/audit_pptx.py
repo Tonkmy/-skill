@@ -164,7 +164,8 @@ def hue_family(hex_):
 def sentence_like(t):
     t = " ".join(t.split())
     words = re.findall(r"[A-Za-z一-鿿]+", t)
-    return len(words) > 6 or bool(re.search(r"[a-z]\.\s+[A-Za-z]", t)) or (t.endswith(".") and not re.search(r"\d\.$", t))
+    # a sentence boundary is ". " + capital; "Aux. tail" (abbreviation + lower case) is a label
+    return len(words) > 6 or bool(re.search(r"[a-z]\.\s+[A-Z]", t)) or (t.endswith(".") and not re.search(r"\d\.$", t))
 
 
 def audit_slide(slide, idx, theme):

@@ -31,7 +31,12 @@ description: >-
    - 运行 `python audit_pptx.py deck.pptx`，逐条过一遍 [checklist.md](checklist.md)。
    - 审计里的 ❌ 和 ⚠️ 要么改掉，要么在交付说明里写明保留的理由。
 4. **交付**：
-   - 另存新版本（如 `<名字>_v1017.pptx`），绝不覆盖用户原件。
+   - 新图画在**新增页面**上，原有页面一律不改。用户指定了工作区 pptx 时，就追加到那份文件里（用户 2026-10-17 的偏好）：
+     1. 先在临时副本上迭代到满意；
+     2. 写入前确认 PowerPoint 没开着这个文件（同目录没有 `~$<文件名>`，`lsof` 也查不到；开着就请用户保存并关闭）；
+     3. 同目录留一份 `<名字>.before-<改动>.pptx` 备份；
+     4. 写入后用 C14N 比对 XML，确认原有页面在语义上没有变化。
+   - 没有指定工作区时，另存为带版本号的新文件（如 `<名字>_v1017.pptx`）。
    - 附上渲染 PNG 和 3–5 行说明：改了什么，哪些需要用户拍板。
    - 最终效果以 PowerPoint 为准。用户在 PowerPoint 里"另存为 PDF"后，运行 `python render.py that.pdf --pptx deck.pptx -o out --frame`，把每张图裁成单独的 PDF。
    - LaTeX 里按 `width=\columnwidth` 或 `\textwidth` 插入，不再额外缩放。
@@ -43,8 +48,9 @@ description: >-
 import os, sys; sys.path.insert(0, os.path.expanduser("~/.claude/skills/paper-figure/scripts"))
 from figkit import Deck
 deck = Deck()                                   # 新建；Deck(path=...) 在已有 pptx 后面追加页
-fig = deck.figure("full", height=4.4, name="Fig.1 architecture")
-a = fig.box(x, y, w, h, "Stem")                 # 灰 = 现成 / 冻结
+fig = deck.figure("full", height=4.4, name="Fig.1 architecture",
+                  origin="center", notes="导出说明…")  # 已有大页面里居中放；备注写进演讲者备注
+a = fig.box(x, y, w, h, "Stem $h$", sub="stages 1–2")  # 灰 = 现成 / 冻结；sub = 第二行小字说明
 b = fig.box(x, y, w, h, "Adapter", role="orange", emphasis=True)  # 创新：亮色 + 粗描边 + glow
 fig.arrow(a, b)                                 # 直线箭头，两端吸附在框上，用户拖框会跟着走
 fig.path([p1, p2, p3], dashed=True)             # 折线（训练专用关系用虚线）；不吸附
@@ -72,5 +78,6 @@ deck.save("out.pptx")
 ## 底线
 
 - 数字只来自用户的结果文件或账本。没有数据就用醒目标注的占位，不编。
-- 不覆盖、不移动用户的原始 pptx 和图，新版本另存。
+- 不改、不删、不移动用户已有的页面和图。新图另起页面或另存新文件；写入用户文件前要有备份。
+- PowerPoint 开着的文件不写：`Deck.save()` 发现 `~$` 锁文件会拒绝写入，这时请用户先关闭文件。
 - 本仓库是公开的。未发表论文的内容（方法细节、数字、图）只放在 `projects/` 和论文自己的目录里，`projects/` 已加入 .gitignore。
