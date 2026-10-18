@@ -30,6 +30,7 @@ description: >-
    - 运行 `python render.py deck.pptx -o out --frame`，用 Read 逐页看 PNG。
    - 运行 `python audit_pptx.py deck.pptx`，逐条过一遍 [checklist.md](checklist.md)。
    - 审计里的 ❌ 和 ⚠️ 要么改掉，要么在交付说明里写明保留的理由。
+   - 小修（只改用户点名的地方）从简：渲染看一眼，写入后跑 compare_decks，不跑全套审计（用户 2026-10-19：「少做点 audit 工作，聚焦在完成任务」）。
 4. **交付**：
    - 新图画在**新增页面**上，原有页面一律不改。用户指定了工作区 pptx 时，就加到那份文件里（用户 2026-10-17 的偏好）。用户说了页码（如「放在 p6」）就用 `deck.move()` 插到那里，后面的页顺延（2026-10-18）：
      1. 先在临时副本上迭代到满意；
