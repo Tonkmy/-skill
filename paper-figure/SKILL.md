@@ -31,11 +31,12 @@ description: >-
    - 运行 `python audit_pptx.py deck.pptx`，逐条过一遍 [checklist.md](checklist.md)。
    - 审计里的 ❌ 和 ⚠️ 要么改掉，要么在交付说明里写明保留的理由。
 4. **交付**：
-   - 新图画在**新增页面**上，原有页面一律不改。用户指定了工作区 pptx 时，就追加到那份文件里（用户 2026-10-17 的偏好）：
+   - 新图画在**新增页面**上，原有页面一律不改。用户指定了工作区 pptx 时，就加到那份文件里（用户 2026-10-17 的偏好）。用户说了页码（如「放在 p6」）就用 `deck.move()` 插到那里，后面的页顺延（2026-10-18）：
      1. 先在临时副本上迭代到满意；
      2. 写入前确认 PowerPoint 没开着这个文件（同目录没有 `~$<文件名>`，`lsof` 也查不到；开着就请用户保存并关闭）；
-     3. 同目录留一份 `<名字>.before-<改动>.pptx` 备份；
-     4. 写入后用 C14N 比对 XML，确认原有页面在语义上没有变化。
+     3. 再确认文件和构建用的副本一致：用户可能刚在 PowerPoint 里改过、存过，不一致就基于最新文件重新构建；
+     4. 同目录留一份 `<名字>.before-<改动>.pptx` 备份；
+     5. 写入后运行 `python compare_decks.py <备份> <新文件>`：按顺序逐页比对 C14N（含备注和图片），原有页面全部 unchanged 才算完成。插页后 python-pptx 会重排 slideN.xml，所以不能按文件名比。
    - 没有指定工作区时，另存为带版本号的新文件（如 `<名字>_v1017.pptx`）。
    - 每页用 `fig.note()` 在右下角（FRAME 外，导出时不会带上）写清：这张图表达什么、放在论文哪一节、替换哪个文件（用户 2026-10-17 的要求）。
    - 附上渲染 PNG 和 3–5 行说明：改了什么，哪些需要用户拍板。
@@ -66,6 +67,7 @@ fig.title(x, y, "(a)", "Shared architecture")   # 面板标题
 fig.legend(x, y, [("arrow", "Forward"), ("dashed", "Training only"), ("icon:snowflake", "Frozen")])
 fig.picture("plot.png", 0, 0, w=fig.width)      # matplotlib 图，1:1
 fig.fit("Encoder")                              # 一行放下这段文字需要的框宽
+deck.move(fig, after="Fig. 1")                  # 插到 FRAME 名含 "Fig. 1" 的页后面；或 position=6
 deck.save("out.pptx")
 ```
 

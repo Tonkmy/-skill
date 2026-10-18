@@ -641,6 +641,23 @@ class Deck:
             slide.notes_slide.notes_text_frame.text = notes
         return fig
 
+    def move(self, fig, after=None, position=None):
+        """Put fig's slide right after the slide whose FRAME name contains `after`, or at the 1-based
+        `position` (e.g. the user asks for "p6"). Later slides shift down unchanged; python-pptx renumbers
+        the slideN.xml part names on save, so compare decks with compare_decks.py, not by part name."""
+        lst = self.prs.slides._sldIdLst
+        ids = list(lst)
+        el = ids[[s.slide_id for s in self.prs.slides].index(fig.slide.slide_id)]
+        if after is not None:
+            hits = [i for i, s in enumerate(self.prs.slides)
+                    if any(sh.name.startswith("FRAME") and after in sh.name for sh in s.shapes) and s is not fig.slide]
+            if not hits:
+                raise ValueError(f"no slide whose FRAME name contains {after!r}")
+            position = hits[0] + 2
+        lst.remove(el)
+        lst.insert(max(0, min(position - 1, len(ids) - 1)), el)
+        return [s.slide_id for s in self.prs.slides].index(fig.slide.slide_id) + 1
+
     def save(self, path, force=False):
         """Write the deck. Refuses when Office has the target open (a ~$ lock file sits next to it):
         a later save in PowerPoint would silently drop these slides."""

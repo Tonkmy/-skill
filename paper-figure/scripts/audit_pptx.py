@@ -4,8 +4,8 @@
 
 Checks what can be measured: sentences in labels (R1), grey vs colour share (R2), typefaces and
 sizes (R3), rounded shapes / radii / line and arrow widths (R4), number of hues (R5), labels that
-collide or leave the frame (R6). Judgement calls (is the structure clear?) still need eyes on the
-rendered PNG.
+collide or leave the frame, lines drawn through label text and neighbouring modules closer than
+tokens.GAP (R6). Judgement calls (is the structure clear?) still need eyes on the rendered PNG.
 """
 import argparse
 import colorsys
@@ -13,6 +13,7 @@ import re
 from collections import Counter
 
 from lxml import etree
+from PIL import ImageFont
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
 from pptx.opc.constants import RELATIONSHIP_TYPE as RT
@@ -168,6 +169,182 @@ def hue_family(hex_):
     return names[int(((h * 360 + 15) % 360) // 30)]
 
 
+# ---- geometry for R6: absolute boxes, line segments, text ink, module gaps --------------------
+def walk_abs(shapes, tf=(0, 1, 0, 1)):
+    """Yield (shape, (x, y, w, h) in slide EMU), resolving group child transforms."""
+    a, b, c, d = tf
+    for s in shapes:
+        x, y, w, h = s.left or 0, s.top or 0, s.width or 0, s.height or 0
+        box = (a + x * b, c + y * d, w * b, h * d)
+        yield s, box
+        if s.shape_type == MSO_SHAPE_TYPE.GROUP:
+            xfrm = s._element.find(qn("p:grpSpPr")).find(f"{A}xfrm")
+            off = xfrm.find(f"{A}chOff") if xfrm is not None else None
+            ext = xfrm.find(f"{A}chExt") if xfrm is not None else None
+            chx, chy = (int(off.get("x")), int(off.get("y"))) if off is not None else (x, y)
+            cw, ch = (int(ext.get("cx")), int(ext.get("cy"))) if ext is not None else (w, h)
+            sx, sy = (w / cw if cw else 1), (h / ch if ch else 1)
+            yield from walk_abs(s.shapes, (box[0] - chx * sx * b, b * sx, box[1] - chy * sy * d, d * sy))
+
+
+def segments(s, box):
+    """Straight segments of a visible connector or open freeform (figkit path), in slide EMU."""
+    el = s._element
+    sppr = el.find(qn("p:spPr"))
+    if sppr is None:
+        return []
+    ln = sppr.find(f"{A}ln")
+    if ln is not None and ln.find(f"{A}noFill") is not None:
+        return []
+    xfrm = sppr.find(f"{A}xfrm")
+    fh = xfrm is not None and xfrm.get("flipH") == "1"
+    fv = xfrm is not None and xfrm.get("flipV") == "1"
+    x, y, w, h = box
+    if el.tag == qn("p:cxnSp"):
+        return [((x + w if fh else x, y + h if fv else y), (x if fh else x + w, y if fv else y + h))]
+    cust = sppr.find(f"{A}custGeom")
+    if cust is None or sppr.find(f"{A}solidFill") is not None or sppr.find(f"{A}gradFill") is not None:
+        return []  # not a freeform, or a filled one (icons)
+    out = []
+    for path in cust.iter(f"{A}path"):
+        pw, ph = int(path.get("w", 0)) or 1, int(path.get("h", 0)) or 1
+        prev = None
+        for cmd in path:
+            pts = cmd.findall(f"{A}pt")
+            if not pts:
+                continue
+            px, py = int(pts[-1].get("x")), int(pts[-1].get("y"))
+            p = (x + (pw - px if fh else px) * w / pw, y + (ph - py if fv else py) * h / ph)
+            if etree.QName(cmd).localname != "moveTo" and prev is not None:
+                out.append((prev, p))  # curves approximated by their chord
+            prev = p
+    return out
+
+
+_FONT_CACHE = {}
+
+
+def _run_width(text, face, size, italic, bold, baseline):
+    """Advance width of a run in EMU, measured with the Inter TTFs (other faces approximated by Inter)."""
+    f = (face or "").lower()
+    weight = "semibold" if "semibold" in f else "medium" if "medium" in f else "bold" if bold else "regular"
+    key = (weight, italic)
+    if key not in _FONT_CACHE:
+        try:
+            _FONT_CACHE[key] = ImageFont.truetype(T.font_file(weight, italic), 200)
+        except (OSError, FileNotFoundError):
+            _FONT_CACHE[key] = None
+    font = _FONT_CACHE[key]
+    pt = (font.getlength(text) / 200 * size) if font else 0.55 * size * len(text)
+    return pt * (0.65 if baseline else 1.0) / 72 * EMU_IN
+
+
+def ink_rects(s, box):
+    """Rough glyph area of each text line (alignment, anchor and insets applied), in slide EMU."""
+    if not (getattr(s, "has_text_frame", False) and s.has_text_frame and s.text_frame.text.strip()):
+        return []
+    body = s.text_frame._txBody.find(f"{A}bodyPr")
+    ins = {k: int(body.get(k, dv)) for k, dv in (("lIns", 91440), ("rIns", 91440), ("tIns", 45720), ("bIns", 45720))}
+    lines = []
+    for p in s.text_frame.paragraphs:
+        ppr = p._p.find(f"{A}pPr")
+        algn = ppr.get("algn", "l") if ppr is not None else "l"
+        width, size = 0.0, 0.0
+        for r in p.runs:
+            rpr = r._r.find(f"{A}rPr")
+            get = (lambda k, dv=None: rpr.get(k, dv)) if rpr is not None else (lambda k, dv=None: dv)
+            sz = int(get("sz")) / 100 if get("sz") else 18.0
+            lat = rpr.find(f"{A}latin") if rpr is not None else None
+            base = int(get("baseline", 0))
+            width += _run_width(r.text, lat.get("typeface") if lat is not None else "Inter", sz, get("i") == "1",
+                                get("b") == "1", base)
+            if not base:
+                size = max(size, sz)
+        lines.append((algn, width, size or 12.0))
+    x, y, w, h = box
+    lh = lambda sz: sz * 1.2 / 72 * EMU_IN  # noqa: E731
+    block = sum(lh(sz) for _, _, sz in lines)
+    anchor = body.get("anchor", "t")
+    top = {"t": y + ins["tIns"], "b": y + h - ins["bIns"] - block}.get(
+        anchor, y + ins["tIns"] + (h - ins["tIns"] - ins["bIns"] - block) / 2)
+    rects = []
+    for algn, width, sz in lines:
+        if width > 0:
+            x0 = {"ctr": x + ins["lIns"] + (w - ins["lIns"] - ins["rIns"] - width) / 2,
+                  "r": x + w - ins["rIns"] - width}.get(algn, x + ins["lIns"])
+            rects.append((x0, top + 0.2 * lh(sz), width, 0.6 * lh(sz)))
+        top += lh(sz)
+    return rects
+
+
+def _hits(seg, rect):
+    """Does the segment cross the rectangle? (Liang-Barsky clipping)"""
+    (x1, y1), (x2, y2) = seg
+    rx, ry, rw, rh = rect
+    dx, dy = x2 - x1, y2 - y1
+    t0, t1 = 0.0, 1.0
+    for p, q in ((-dx, x1 - rx), (dx, rx + rw - x1), (-dy, y1 - ry), (dy, ry + rh - y1)):
+        if p == 0:
+            if q < 0:
+                return False
+        else:
+            t = q / p
+            if p < 0:
+                t0 = max(t0, t)
+            else:
+                t1 = min(t1, t)
+            if t0 > t1:
+                return False
+    return True
+
+
+def lines_through_text(slide):
+    """Labels that a connector or path is drawn through (rule 1: lines never cross text)."""
+    items = [(s, box) for s, box in walk_abs(slide.shapes) if not s.name.startswith(("FRAME", "NOTE"))]
+    segs = [sg for s, box in items for sg in segments(s, box)]
+    hit = []
+    for s, box in items:
+        if any(_hits(sg, r) for r in ink_rects(s, box) for sg in segs):
+            hit.append(s.text_frame.text.strip().replace("\n", " ")[:24])
+    return hit
+
+
+def tight_gaps(slide):
+    """Neighbouring modules (same row or column) closer than tokens.GAP. Modules are top-level boxes,
+    ellipses, pictures and groups (stacks, vectors) at least 0.3 in long; containers are skipped."""
+    mods = []
+    for s in slide.shapes:
+        if s.name.startswith(("FRAME", "NOTE")) or s.shape_type == MSO_SHAPE_TYPE.LINE:
+            continue
+        if s._element.tag == qn("p:cxnSp") or max(s.width or 0, s.height or 0) < 0.3 * EMU_IN:
+            continue
+        if s.shape_type not in (MSO_SHAPE_TYPE.PICTURE, MSO_SHAPE_TYPE.GROUP):
+            sppr = s._element.find(qn("p:spPr"))
+            if sppr is None or sppr.find(f"{A}custGeom") is not None:
+                continue
+            ln = sppr.find(f"{A}ln")
+            visible = sppr.find(f"{A}solidFill") is not None or (ln is not None and ln.find(f"{A}noFill") is None
+                                                                 and ln.find(f"{A}solidFill") is not None)
+            if not visible:
+                continue  # plain text box
+        mods.append((s.name, (s.left, s.top, s.width, s.height)))
+    tol = 0.01 * EMU_IN
+    inside = lambda p, q: (p[0] >= q[0] - tol and p[1] >= q[1] - tol and p[0] + p[2] <= q[0] + q[2] + tol  # noqa: E731
+                           and p[1] + p[3] <= q[1] + q[3] + tol)
+    mods = [m for m in mods if not any(o is not m and inside(o[1], m[1]) for o in mods)]  # drop containers
+    out, lim = [], (T.GAP - 0.02) * EMU_IN
+    for i in range(len(mods)):
+        for j in range(i + 1, len(mods)):
+            (na, a), (nb, b) = mods[i], mods[j]
+            for k in (0, 1):  # k = 0: same row, horizontal gap; k = 1: same column, vertical gap
+                o = 1 - k
+                overlap = min(a[o] + a[o + 2], b[o] + b[o + 2]) - max(a[o], b[o])
+                gap = max(a[k], b[k]) - min(a[k] + a[k + 2], b[k] + b[k + 2])
+                if overlap >= 0.5 * min(a[o + 2], b[o + 2]) and 0 < gap < lim:
+                    out.append(f"{na[:16]}↔{nb[:16]} {gap / EMU_IN:.2f}")
+    return out
+
+
 def sentence_like(t):
     t = " ".join(t.split())
     words = [w for w in re.findall(r"[A-Za-z一-鿿]+", t) if len(w) > 1]  # skip math variables
@@ -272,8 +449,13 @@ def audit_slide(slide, idx, theme):
         fx, fy, fw, fh = frame["box"]
         out = [x["name"] for x in shapes if x["box"][2] and (x["box"][0] < fx - 1 or x["box"][1] < fy - 1 or
                x["box"][0] + x["box"][2] > fx + fw + 1 or x["box"][1] + x["box"][3] > fy + fh + 1)]
-    rows.append(("R6 留白/不重叠", "⚠️" if clash or out else "✅",
-                 ("文本框部分重叠：" + "；".join(clash[:4]) if clash else "无文本重叠") + (f"；{len(out)} 个元素超出 FRAME" if out else "")))
+    crossed, tight = lines_through_text(slide), tight_gaps(slide)
+    detail = ("文本框部分重叠：" + "；".join(clash[:4]) if clash else "无文本重叠") + (f"；{len(out)} 个元素超出 FRAME" if out else "")
+    if crossed:
+        detail += "；连线穿过文字：" + "；".join(f"「{t}」" for t in crossed[:4])
+    if tight:
+        detail += f"；{len(tight)} 处模块间距 < {T.GAP:.2f} in：" + "；".join(tight[:4]) + (" …" if len(tight) > 4 else "")
+    rows.append(("R6 留白/不重叠", "⚠️" if clash or out or crossed or tight else "✅", detail))
 
     return rows, facts
 
