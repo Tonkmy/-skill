@@ -560,6 +560,7 @@ class Figure:
                 _set_fill(shp, c)
                 _set_line(shp, None)
                 _effects(shp)
+            grp.shapes._recalculate_extents()  # build_freeform skips this; a 0x0 group vanishes in PowerPoint once moved
             grp.name = "icon: flame (trainable)"
             return Node(grp, x, y, size, size)
         raise ValueError(kind)

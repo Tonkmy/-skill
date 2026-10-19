@@ -41,7 +41,11 @@ description: >-
    - 没有指定工作区时，另存为带版本号的新文件（如 `<名字>_v1017.pptx`）。
    - 每页用 `fig.note()` 在右下角（FRAME 外，导出时不会带上）写清：这张图表达什么、放在论文哪一节、替换哪个文件（用户 2026-10-17 的要求）。
    - 附上渲染 PNG 和 3–5 行说明：改了什么，哪些需要用户拍板。
-   - 最终效果以 PowerPoint 为准。用户在 PowerPoint 里"另存为 PDF"后，运行 `python render.py that.pdf --pptx deck.pptx -o out --frame`，把每张图裁成单独的 PDF。
+   - **导出给论文**：每张图存成一个 PDF，文件名写图要表达的内容，简单写，如 `v1_architecture.pdf`（用户 2026-10-19）。
+     - 原生形状画的图：`python render.py deck.pptx -o out --frame --slides 7`（本机 LibreOffice，Inter 嵌入）。也可以先让用户在 PowerPoint 里选「另存为 PDF → 最适合打印」，再运行 `render.py that.pdf --pptx deck.pptx -o out --frame`。裁剪会删掉 FRAME 外的内容并清空元数据，可以直接用于双盲投稿。
+     - 不能用 PowerPoint 的「电子分发（Microsoft 在线服务）」导出的 PDF：转换在服务器上做，那里没有 Inter，文字全变成 Calibri（2026-10-19 实测）。
+     - 数据图在 pptx 里是 PNG，交付时用 plot_style 出的矢量 PDF。
+     - 用户手动改过的页，先确认内容还在 FRAME 里。
    - LaTeX 里按 `width=\columnwidth` 或 `\textwidth` 插入，不再额外缩放。
 5. **沉淀**：把用户的修改意见原话记进 taste-log.md，写明日期、哪张图、意见原话、落成了什么改动。
 

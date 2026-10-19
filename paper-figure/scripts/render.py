@@ -51,6 +51,28 @@ def frames(pptx):
     return out, prs.slide_width
 
 
+def crop_pdf(doc, i, clip, path):
+    """Page i of doc as a stand-alone figure PDF for LaTeX. Content outside the frame (the working
+    note, anything parked off-canvas) is deleted rather than hidden, since pdflatex embeds the whole
+    page; document metadata is cleared; MediaBox = CropBox = the frame. Text and lines stay vector."""
+    one = pymupdf.open()
+    one.insert_pdf(doc, from_page=i, to_page=i)
+    page, r, e = one[0], one[0].rect, 0.5  # e: keep the cut 0.5 pt clear of the frame edge
+    for box in (pymupdf.Rect(r.x0, r.y0, r.x1, clip.y0 - e), pymupdf.Rect(r.x0, clip.y1 + e, r.x1, r.y1),
+                pymupdf.Rect(r.x0, r.y0, clip.x0 - e, r.y1), pymupdf.Rect(clip.x1 + e, r.y0, r.x1, r.y1)):
+        if not box.is_empty:
+            page.add_redact_annot(box, fill=False)
+    page.apply_redactions(images=pymupdf.PDF_REDACT_IMAGE_PIXELS,
+                          graphics=pymupdf.PDF_REDACT_LINE_ART_REMOVE_IF_COVERED)
+    page.clean_contents(sanitize=True)  # also drops resources nothing uses now (e.g. the note's CJK font)
+    page.set_cropbox(clip)
+    one.xref_set_key(page.xref, "MediaBox", one.xref_get_key(page.xref, "CropBox")[1])
+    one.set_metadata({})
+    one.del_xml_metadata()
+    one.save(path, garbage=4, deflate=True)
+    return path
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("src", help=".pptx (rendered with LibreOffice) or .pdf (e.g. PowerPoint export)")
@@ -78,10 +100,9 @@ def main():
             k = page.rect.width / slide_w
             x, y, w, h = (v * k for v in fr[i])
             clip = pymupdf.Rect(x, y, x + w, y + h) & page.rect
-            one = pymupdf.open()
-            one.insert_pdf(doc, from_page=i, to_page=i)
-            one[0].set_cropbox(clip)
-            one.save(os.path.join(a.out, f"{stem}_slide{i + 1}.pdf"))
+            out = crop_pdf(doc, i, clip, os.path.join(a.out, f"{stem}_slide{i + 1}.pdf"))
+            page = pymupdf.open(out)[0]  # preview what LaTeX will get
+            clip = None
         png = os.path.join(a.out, f"{stem}_slide{i + 1}.png")
         page.get_pixmap(dpi=a.dpi, clip=clip).save(png)
         print(png)
