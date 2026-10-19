@@ -34,8 +34,8 @@ DARK = {k: "#" + v["text"] for k, v in T.ACCENTS.items()}  # annotation text in 
 BASE = "#" + T.GRAY["border"]  # baselines and reference series
 BASE_DARK = "#" + T.GRAY["muted"]
 TEXT = "#" + T.GRAY["text"]
-LW = 2.5  # data lines (1.5 pt in print)
-MS = 9  # marker size
+LW = 1.4  # data lines (~0.85 pt in print; user 2026-10-19: thinner, legibility first)
+MS = 6.5  # marker size
 
 plt.rcParams.update({
     "font.family": "Inter",
