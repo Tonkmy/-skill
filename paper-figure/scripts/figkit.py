@@ -116,6 +116,11 @@ def parse_rich(s):
 _FONT_CACHE = {}
 
 
+# LibreOffice draws OOXML sub/superscripts at 58% of the run size (PowerPoint at about 2/3), so script runs
+# get at least SCRIPT_PT and still print >= tokens.SCRIPT_MIN after that shrink (user 2026-10-21).
+SCRIPT_PT = T.SCRIPT_MIN / 0.58
+
+
 def text_width(s, size="module", weight="regular"):
     """Rendered width of a (rich) string in canvas inches, measured with the Inter TTFs."""
     pt = T.SIZE.get(size, size)
@@ -127,7 +132,7 @@ def text_width(s, size="module", weight="regular"):
             key = (weight, st["italic"])
             if key not in _FONT_CACHE:
                 _FONT_CACHE[key] = ImageFont.truetype(T.font_file(weight, st["italic"]), 200)
-            w += _FONT_CACHE[key].getlength(text) / 200 * pt * scale
+            w += _FONT_CACHE[key].getlength(text) / 200 * (max(pt, SCRIPT_PT) if st["baseline"] else pt) * scale
         width = max(width, w)
     return width / 72
 
@@ -139,7 +144,8 @@ def _style_run(run, text, st, size, weight, color, bold=None):
     f.name = family
     f.bold = is_bold if bold is None else bold
     f.italic = st["italic"]
-    f.size = Pt(T.SIZE.get(size, size))
+    pt = T.SIZE.get(size, size)
+    f.size = Pt(max(pt, SCRIPT_PT) if st["baseline"] else pt)
     f.color.rgb = _rgb(_color(color))
     rpr = run._r.get_or_add_rPr()
     for tag in ("a:latin", "a:ea", "a:cs"):  # pin every script slot to Inter (no theme fallback)

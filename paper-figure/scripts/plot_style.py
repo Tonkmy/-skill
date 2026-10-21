@@ -90,6 +90,13 @@ plt.rcParams.update({
     "svg.fonttype": "none",
 })
 
+# mathtext shrinks sub/superscripts to 0.7 of the base; keep them >= tokens.SCRIPT_MIN at the note size (2026-10-21)
+try:
+    import matplotlib._mathtext as _mathtext
+    _mathtext.SHRINK_FACTOR = max(_mathtext.SHRINK_FACTOR, T.SCRIPT_MIN / T.SIZE["note"])
+except (ImportError, AttributeError):
+    pass
+
 
 def figure(slot="column", height=3.6, nrows=1, ncols=1, width=None, venue="ieee", **kw):
     """Figure at canvas size (inches) with constrained layout."""

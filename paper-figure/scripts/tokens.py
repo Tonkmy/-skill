@@ -113,3 +113,6 @@ PAD = 0.12  # text inset inside a module
 GAP = 0.30  # minimum gap between neighbouring modules
 GROUP_PAD = 0.20  # inset of a container around its modules
 MARGIN = 0.20  # keep-out band inside the export frame
+
+# Sub/superscripts get at least this many canvas pt, so they print >= 6 pt (user 2026-10-21: fonts too small).
+SCRIPT_MIN = 10
