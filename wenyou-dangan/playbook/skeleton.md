@@ -184,3 +184,23 @@ const currentQuest = () => QUESTS.find(q => !q.done());
 
 - BGM 只能在用户点击之后 `play()`（浏览器禁止自动播放），所以放在开始按钮的回调里，并提供开关。建议再加一条：`visibilitychange` 时暂停。
 - 不要用免费图床：链接一失效，游戏就没图了。托管方式见 [assets.md](assets.md)。
+
+## 13. 可测试的模型段
+
+把所有改状态的逻辑（数据表、行动、结算、剧情、结局）放进一段，用注释标出边界，这一段里不碰 DOM：
+
+```js
+/*MODEL-START*/
+let R = Math.random; function setRng(f){ R = f; }    // 测试时换成带种子的随机数
+const HOOKS = { unlock(){}, checkpoint(){}, sfx(){} }; // 界面层再覆盖这些钩子
+const EVQ = [];                                        // 剧情事件只入队，由界面层弹出
+function gather(S){ … } function endDay(S){ … }
+/*MODEL-END*/
+```
+
+node 里截出这一段，用 `vm.runInNewContext(model + ';({gather, endDay, …})')` 就能跑机器人对局（[economy.md §7](economy.md)）。事件选项的 `fn` 只改 S；要接着弹下一个，就 `EVQ.unshift(...)`。
+
+## 14. 两种发布形态
+
+- **Artifact（试玩链接）**：源文件不写 `<!doctype>`、`<html>`、`<head>`、`<body>`，发布时平台会自动包一层；文件开头直接写 `<title>`、`<style>`。本地存储的读写都包上 try/catch；没有 `alert` / `confirm`，确认都做成弹窗。
+- **独立版（发给玩家）**：用档案里的 `tools/build.sh` 补上 doctype、head、viewport，生成可以双击打开的文件。Google Fonts 在国内可能加载不到，字体栈要以系统楷体、宋体兜底。
