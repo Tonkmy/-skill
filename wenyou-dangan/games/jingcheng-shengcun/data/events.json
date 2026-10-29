@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "type": "data",
+    "game": "jingcheng-shengcun",
+    "updated": "2026-10-29",
+    "source": "page.html（本地），行号见 line",
+    "schema": "track 线 / trigger 触发条件 / choices 选项及效果 / effect 无选项时的效果 / line 源码行号"
+  },
+  "events": [
+    {"id": "family.letter", "track": "原生家庭", "line": 3455, "trigger": "familyStage=0 且 xun>=5 且 money>=320",
+     "choices": [{"t": "寄三百文", "effect": "money-300"}, {"t": "回信拒绝", "effect": "money-5, fame-15"}]},
+    {"id": "family.mother", "track": "原生家庭", "line": 3462, "trigger": "familyStage=2 且 距上一段>=4旬 且 money>=600",
+     "choices": [{"t": "给八百文", "effect": "money-800, fame+3"}, {"t": "一分不给", "effect": "fame-5"}, {"t": "只给两百", "effect": "money-200"}]},
+    {"id": "family.brother", "track": "原生家庭", "line": 3470, "trigger": "familyStage=4 且 距上一段>=4旬",
+     "choices": [{"t": "收留", "effect": "之后每旬 money-(40~130)，直到断亲"}, {"t": "赶出去", "effect": "fame-5"}]},
+    {"id": "family.sever", "track": "原生家庭", "line": 3448, "trigger": "money>=4000 且 familyStage>=1 且未断亲；每旬优先检查",
+     "choices": [{"t": "四两银子断亲", "effect": "money-4000, severed=true"}, {"t": "再等等", "effect": "下旬再问"}]},
+
+    {"id": "survival.hunger", "track": "生存", "line": 3264, "trigger": "转旬时 hunger<30", "effect": "health-7；若 hunger<=0 再 health-18"},
+    {"id": "survival.sick", "track": "生存", "line": 3266, "trigger": "转旬时 sick，或 hunger<30 时 25%", "effect": "生病：每旬 health-9，打工收入×0.6"},
+    {"id": "survival.evict", "track": "生存", "line": 3295, "trigger": "付不起房租", "effect": "money=0，搬回破庙"},
+    {"id": "survival.death", "track": "生存", "line": 3395, "trigger": "health<=0，或 hunger<=0 且 health<=20", "effect": "游戏结束：你在京城一共活了 xun×10 天"},
+
+    {"id": "night.random", "track": "随机", "line": 3414, "trigger": "每旬 20%（破庙 35%）",
+     "outcomes": [
+       {"p": 0.16, "t": "遭贼", "effect": "money-(10~45)"},
+       {"p": 0.18, "t": "冻得睡不着", "effect": "stamina-12，30% 生病"},
+       {"p": 0.20, "t": "邻居送粥", "effect": "hunger+18"},
+       {"p": 0.14, "t": "墙缝里的铜板", "effect": "money+(5~22)"},
+       {"p": 0.12, "t": "门外有人徘徊（需美貌>=42）", "effect": "选屏息或喊人"},
+       {"p": "其余", "t": "一夜安稳", "effect": "无"}
+     ]},
+
+    {"id": "npc.story.warm", "track": "男主", "line": 2962, "trigger": "暖男（沈砚、陆时安、阿福、谢怀安）好感到 20 / 50 / 80 / 100 依次触发 4 段",
+     "effect": "第 4 段给结局选择，见 characters.json"},
+    {"id": "npc.story.bad", "track": "男主", "line": 2987, "trigger": "嫁给渣男（裴景行、顾燕）后，调查进度到 20 / 50 / 80 / 100 依次触发 4 段",
+     "choices": [{"t": "和离", "effect": "恢复单身"}, {"t": "忍气吞声", "effect": "affairDiscovered=true，继续婚姻"}]},
+    {"id": "marriage.investigate", "track": "婚姻", "line": 2620, "trigger": "嫁给渣男后可点「暗中调查」（体力 15，占行动）", "effect": "成功率 35+智慧×0.6，进度 +20~35"},
+
+    {"id": "lover.offer", "track": "修罗场", "line": 3070, "trigger": "已婚，另一男主好感>=100",
+     "choices": [{"t": "成为情人", "effect": "lover=true，可幽会"}, {"t": "婉拒", "effect": "aff-20"}, {"t": "点遮罩不回应", "effect": "aff-20"}]},
+    {"id": "lover.jealous", "track": "修罗场", "line": 3108, "trigger": "对某个情人 trystCount>=5（只触发一次）",
+     "choices": [{"t": "安抚", "effect": "aff+5"}, {"t": "敷衍", "effect": "aff-10"}]},
+    {"id": "husband.jealous", "track": "修罗场", "line": 3128, "trigger": "已婚，连续 5 旬没行房，且没怀孕",
+     "choices": [{"t": "解释清楚", "effect": "aff+5，可再次触发"}, {"t": "敷衍", "effect": "aff-10"}, {"t": "反唇相讥", "effect": "aff-15"}]},
+    {"id": "husband.trystAnger", "track": "修罗场", "line": 3209, "trigger": "任一情人 trystCount>=3；每任夫君只触发一次",
+     "choices": [{"t": "服软", "effect": "夫君 aff+10"}, {"t": "硬碰硬", "effect": "aff-20, health-5"}, {"t": "沉默", "effect": "aff-10"}]},
+    {"id": "rival.clash", "track": "修罗场", "line": 3146, "trigger": "情人数>=2，且人数和上次不同",
+     "choices": [{"t": "选 A", "effect": "A+20，B-30 且解除"}, {"t": "选 B", "effect": "对称"}, {"t": "都要", "effect": "两人各 +15"}, {"t": "都不选", "effect": "两人各 -30 且解除"}]},
+
+    {"id": "pregnancy.reaction", "track": "子女", "line": 1437, "trigger": "怀上的那一刻", "effect": "依次弹出夫君「惊喜」剧情和每个情人「窃喜」剧情"},
+    {"id": "pregnancy.birth", "track": "子女", "line": 3269, "trigger": "孕期满 3 旬", "effect": "男 40%、女 40%、龙凤胎 10%、双胞胎 10%；逐个取名"},
+    {"id": "child.portrait", "track": "子女", "line": 2834, "trigger": "孩子 15 岁",
+     "choices": [{"t": "门当户对", "effect": "orientation=normal"}, {"t": "角落那幅画", "effect": "orientation=queer（同性伴侣）"}]},
+    {"id": "child.marriage", "track": "子女", "line": 2860, "trigger": "孩子 16 岁", "effect": "办婚礼 5000 文；同性伴侣时母亲先反对，之后可以回心转意"},
+    {"id": "child.salary", "track": "子女", "line": 3337, "trigger": "每 3 旬，每个做官的孩子", "effect": "money+300000"},
+
+    {"id": "casino.caught", "track": "随机", "line": 2438, "trigger": "一旬内连赢 3 把", "effect": "现金和存款全被搜走"},
+    {"id": "author.gift", "track": "福利", "line": 3902, "trigger": "点属性页立绘", "effect": "money+100，次数不限"}
+  ]
+}

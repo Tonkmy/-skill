@@ -1,0 +1,1027 @@
+{
+ "HOUSING": {
+  "破庙": {
+   "icon": "🏚️",
+   "hp": -7,
+   "rent": 0,
+   "price": 0,
+   "act": [
+    "shan",
+    "bath",
+    "sleep",
+    "practice",
+    "cook"
+   ],
+   "fame": 0
+  },
+  "小木屋": {
+   "icon": "🏠",
+   "hp": 0,
+   "rent": 15,
+   "price": 800,
+   "act": [
+    "shan",
+    "bath",
+    "sleep",
+    "practice",
+    "cook",
+    "makeup",
+    "wear"
+   ],
+   "fame": 5
+  },
+  "小院子": {
+   "icon": "🏡",
+   "hp": 3,
+   "rent": 0,
+   "price": 4000,
+   "act": [
+    "shan",
+    "bath",
+    "sleep",
+    "practice",
+    "cook",
+    "makeup",
+    "wear",
+    "farm",
+    "raise"
+   ],
+   "fame": 15
+  },
+  "大宅院": {
+   "icon": "🏯",
+   "hp": 6,
+   "rent": 0,
+   "price": 15000,
+   "act": [
+    "shan",
+    "bath",
+    "sleep",
+    "practice",
+    "cook",
+    "makeup",
+    "wear",
+    "farm",
+    "raise"
+   ],
+   "fame": 40
+  }
+ },
+ "HOUSE_ORDER": [
+  "破庙",
+  "小木屋",
+  "小院子",
+  "大宅院"
+ ],
+ "SKILL_DEFS": {
+  "medicine": {
+   "n": "医术",
+   "ic": "💊",
+   "cost": 10
+  },
+  "embroidery": {
+   "n": "绣花",
+   "ic": "🧵",
+   "cost": 8
+  },
+  "cooking": {
+   "n": "厨艺",
+   "ic": "🍳",
+   "cost": 6
+  },
+  "gathering": {
+   "n": "采集",
+   "ic": "🌿",
+   "cost": 0
+  },
+  "hunting": {
+   "n": "狩猎",
+   "ic": "🏹",
+   "cost": 0
+  },
+  "farming": {
+   "n": "农耕",
+   "ic": "🌾",
+   "cost": 0
+  },
+  "husbandry": {
+   "n": "畜牧",
+   "ic": "🐄",
+   "cost": 0
+  },
+  "music": {
+   "n": "音律",
+   "ic": "🎵",
+   "cost": 15
+  },
+  "painting": {
+   "n": "书画",
+   "ic": "🖌️",
+   "cost": 12
+  }
+ },
+ "CLOTHES": {
+  "粗布衣裳": {
+   "bonus": {},
+   "price": 0,
+   "d": "初始衣衫"
+  },
+  "素色襦裙": {
+   "bonus": {
+    "beauty": 3
+   },
+   "price": 180,
+   "d": "美貌+3"
+  },
+  "青黛春山裙": {
+   "bonus": {
+    "beauty": 2,
+    "wisdom": 3
+   },
+   "price": 320,
+   "d": "美貌+2 智慧+3"
+  },
+  "丹霞浅青襦裙": {
+   "bonus": {
+    "beauty": 5
+   },
+   "price": 480,
+   "d": "美貌+5"
+  },
+  "粉袖绿裙": {
+   "bonus": {
+    "beauty": 6,
+    "embroidery": 3
+   },
+   "price": 680,
+   "d": "美貌+6 绣花+3"
+  },
+  "粉紫礼服": {
+   "bonus": {
+    "beauty": 8,
+    "music": 3
+   },
+   "price": 980,
+   "d": "美貌+8 音律+3"
+  },
+  "绯烟紫绶华裳": {
+   "bonus": {
+    "beauty": 12,
+    "wisdom": 4
+   },
+   "price": 1800,
+   "d": "美貌+12 智慧+4"
+  },
+  "金贵华贵礼服": {
+   "bonus": {
+    "beauty": 16,
+    "wisdom": 6,
+    "music": 4,
+    "embroidery": 4
+   },
+   "price": 3200,
+   "d": "美貌+16 多技能+"
+  }
+ },
+ "JOBS": [
+  {
+   "id": "beg",
+   "n": "沿街乞讨",
+   "c": 8,
+   "h": 5,
+   "pay": [
+    3,
+    12
+   ],
+   "req": null
+  },
+  {
+   "id": "sweep",
+   "n": "扫大街",
+   "c": 13,
+   "h": 6,
+   "pay": [
+    14,
+    26
+   ],
+   "req": null
+  },
+  {
+   "id": "wash",
+   "n": "酒楼洗碗",
+   "c": 15,
+   "h": 7,
+   "pay": [
+    20,
+    36
+   ],
+   "req": null,
+   "sk": "cooking",
+   "skv": 1
+  },
+  {
+   "id": "water",
+   "n": "挑水",
+   "c": 16,
+   "h": 7,
+   "pay": [
+    18,
+    32
+   ],
+   "req": null
+  },
+  {
+   "id": "wood",
+   "n": "劈柴",
+   "c": 17,
+   "h": 7,
+   "pay": [
+    20,
+    34
+   ],
+   "req": null
+  },
+  {
+   "id": "cloth",
+   "n": "洗衣裳",
+   "c": 15,
+   "h": 6,
+   "pay": [
+    22,
+    38
+   ],
+   "req": null
+  },
+  {
+   "id": "letter",
+   "n": "送信跑腿",
+   "c": 14,
+   "h": 6,
+   "pay": [
+    26,
+    46
+   ],
+   "req": {
+    "wisdom": 20
+   }
+  },
+  {
+   "id": "port",
+   "n": "码头搬货",
+   "c": 24,
+   "h": 10,
+   "pay": [
+    40,
+    66
+   ],
+   "req": null
+  },
+  {
+   "id": "stall",
+   "n": "看摊",
+   "c": 14,
+   "h": 6,
+   "pay": [
+    30,
+    50
+   ],
+   "req": {
+    "wisdom": 25
+   }
+  },
+  {
+   "id": "serve",
+   "n": "酒楼跑堂",
+   "c": 19,
+   "h": 8,
+   "pay": [
+    46,
+    76
+   ],
+   "req": {
+    "wisdom": 30
+   },
+   "sk": "cooking",
+   "skv": 1
+  },
+  {
+   "id": "herb",
+   "n": "药铺抓药",
+   "c": 16,
+   "h": 7,
+   "pay": [
+    60,
+    96
+   ],
+   "req": {
+    "medicine": 15
+   },
+   "sk": "medicine",
+   "skv": 2
+  },
+  {
+   "id": "embro",
+   "n": "布庄绣娘",
+   "c": 17,
+   "h": 7,
+   "pay": [
+    62,
+    104
+   ],
+   "req": {
+    "embroidery": 15
+   },
+   "sk": "embroidery",
+   "skv": 2
+  },
+  {
+   "id": "maid",
+   "n": "大户丫鬟",
+   "c": 18,
+   "h": 8,
+   "pay": [
+    76,
+    124
+   ],
+   "req": {
+    "beauty": 44
+   }
+  },
+  {
+   "id": "paint",
+   "n": "画坊描样",
+   "c": 16,
+   "h": 7,
+   "pay": [
+    96,
+    164
+   ],
+   "req": {
+    "painting": 15
+   },
+   "sk": "painting",
+   "skv": 2
+  },
+  {
+   "id": "tea",
+   "n": "茶馆茶艺",
+   "c": 17,
+   "h": 7,
+   "pay": [
+    88,
+    148
+   ],
+   "req": {
+    "music": 15
+   },
+   "sk": "music",
+   "skv": 1
+  },
+  {
+   "id": "tutor",
+   "n": "私塾陪读",
+   "c": 15,
+   "h": 7,
+   "pay": [
+    98,
+    158
+   ],
+   "req": {
+    "wisdom": 52
+   },
+   "sk": "painting",
+   "skv": 1
+  },
+  {
+   "id": "copy",
+   "n": "书院抄书",
+   "c": 15,
+   "h": 7,
+   "pay": [
+    70,
+    120
+   ],
+   "req": {
+    "wisdom": 48
+   },
+   "sk": "painting",
+   "skv": 1
+  },
+  {
+   "id": "silk",
+   "n": "绸缎庄管事",
+   "c": 20,
+   "h": 8,
+   "pay": [
+    190,
+    306
+   ],
+   "req": {
+    "wisdom": 68
+   }
+  },
+  {
+   "id": "account",
+   "n": "商行账房",
+   "c": 16,
+   "h": 8,
+   "pay": [
+    186,
+    298
+   ],
+   "req": {
+    "wisdom": 62
+   }
+  },
+  {
+   "id": "spice",
+   "n": "香料铺掌柜",
+   "c": 18,
+   "h": 8,
+   "pay": [
+    218,
+    346
+   ],
+   "req": {
+    "wisdom": 72
+   }
+  },
+  {
+   "id": "music",
+   "n": "乐坊弹唱",
+   "c": 18,
+   "h": 8,
+   "pay": [
+    168,
+    288
+   ],
+   "req": {
+    "music": 40
+   },
+   "sk": "music",
+   "skv": 2
+  },
+  {
+   "id": "dance",
+   "n": "舞姬",
+   "c": 20,
+   "h": 9,
+   "pay": [
+    248,
+    398
+   ],
+   "req": {
+    "music": 50
+   },
+   "sk": "music",
+   "skv": 2
+  }
+ ],
+ "DISHES": [
+  {
+   "n": "清粥",
+   "price": 2,
+   "hung": 15,
+   "stam": 5,
+   "sk": 0.5
+  },
+  {
+   "n": "馒头",
+   "price": 4,
+   "hung": 20,
+   "stam": 8,
+   "sk": 0.5
+  },
+  {
+   "n": "阳春面",
+   "price": 8,
+   "hung": 30,
+   "stam": 12,
+   "sk": 1
+  },
+  {
+   "n": "炒青菜",
+   "price": 10,
+   "hung": 28,
+   "stam": 10,
+   "sk": 1
+  },
+  {
+   "n": "红烧肉",
+   "price": 25,
+   "hung": 45,
+   "stam": 20,
+   "sk": 2
+  },
+  {
+   "n": "八宝鸭",
+   "price": 60,
+   "hung": 65,
+   "stam": 32,
+   "sk": 3
+  }
+ ],
+ "MARKET_ITEMS": [
+  {
+   "n": "普通草药",
+   "price": 15,
+   "desc": "可卖/可送人/可使用"
+  },
+  {
+   "n": "珍贵草药",
+   "price": 80,
+   "desc": "可卖/可送人/可使用"
+  },
+  {
+   "n": "野兔",
+   "price": 35,
+   "desc": "摆摊可卖"
+  },
+  {
+   "n": "山鸡",
+   "price": 45,
+   "desc": "摆摊可卖"
+  },
+  {
+   "n": "鹿肉",
+   "price": 120,
+   "desc": "摆摊可卖"
+  },
+  {
+   "n": "绣帕",
+   "price": 40,
+   "desc": "摆摊可卖"
+  },
+  {
+   "n": "绣荷包",
+   "price": 80,
+   "desc": "摆摊可卖"
+  },
+  {
+   "n": "绣屏风",
+   "price": 300,
+   "desc": "摆摊可卖"
+  },
+  {
+   "n": "猎刀",
+   "price": 100,
+   "desc": "狩猎工具"
+  },
+  {
+   "n": "猎弓",
+   "price": 300,
+   "desc": "狩猎工具"
+  },
+  {
+   "n": "针线包",
+   "price": 30,
+   "desc": "练习绣花（可反复使用）"
+  },
+  {
+   "n": "笔墨纸砚",
+   "price": 50,
+   "desc": "练习书画（可反复使用）"
+  },
+  {
+   "n": "琴弦",
+   "price": 60,
+   "desc": "练习音律"
+  },
+  {
+   "n": "避孕药",
+   "price": 100,
+   "desc": "使用后孕率-30"
+  },
+  {
+   "n": "《京华见闻录》",
+   "price": 150,
+   "desc": "智慧+3，可使用/可送人"
+  },
+  {
+   "n": "《本草备要》",
+   "price": 180,
+   "desc": "医术+5，可使用/可送人"
+  },
+  {
+   "n": "《妆台记》",
+   "price": 120,
+   "desc": "美貌+3，可使用/可送人"
+  },
+  {
+   "n": "胭脂水粉",
+   "price": 150,
+   "desc": "美貌+4，可使用"
+  }
+ ],
+ "SELL_PRICE": {
+  "普通草药": 15,
+  "珍贵草药": 80,
+  "野兔": 35,
+  "山鸡": 45,
+  "鹿肉": 120,
+  "野猪肉": 180,
+  "绣帕": 40,
+  "绣荷包": 80,
+  "绣屏风": 300,
+  "蔬菜": 20,
+  "粮食": 30,
+  "鸡蛋": 15,
+  "鸭蛋": 18,
+  "鹅蛋": 22,
+  "牛奶": 35,
+  "羊毛": 45,
+  "猪肉": 80,
+  "小麦": 25,
+  "稻米": 28,
+  "鲜花": 30,
+  "清粥": 5,
+  "馒头": 8,
+  "阳春面": 15,
+  "炒青菜": 18,
+  "红烧肉": 45,
+  "八宝鸭": 100
+ },
+ "SEEDS": {
+  "wheat": {
+   "n": "小麦种子",
+   "price": 10,
+   "crop": "小麦",
+   "grow": 3,
+   "yld": [
+    2,
+    4
+   ]
+  },
+  "rice": {
+   "n": "水稻种子",
+   "price": 12,
+   "crop": "稻米",
+   "grow": 3,
+   "yld": [
+    2,
+    4
+   ]
+  },
+  "veg": {
+   "n": "蔬菜种子",
+   "price": 15,
+   "crop": "蔬菜",
+   "grow": 2,
+   "yld": [
+    2,
+    3
+   ]
+  },
+  "herb": {
+   "n": "药材种子",
+   "price": 25,
+   "crop": "普通草药",
+   "grow": 4,
+   "yld": [
+    1,
+    2
+   ]
+  },
+  "flower": {
+   "n": "花种子",
+   "price": 20,
+   "crop": "鲜花",
+   "grow": 3,
+   "yld": [
+    2,
+    4
+   ]
+  }
+ },
+ "ANIMALS": {
+  "chicken": {
+   "n": "鸡",
+   "ic": "🐔",
+   "price": 30,
+   "feed": 1,
+   "prod": "鸡蛋",
+   "cycle": 1,
+   "sell": 20
+  },
+  "duck": {
+   "n": "鸭",
+   "ic": "🦆",
+   "price": 35,
+   "feed": 1,
+   "prod": "鸭蛋",
+   "cycle": 1,
+   "sell": 25
+  },
+  "goose": {
+   "n": "鹅",
+   "ic": "🦢",
+   "price": 45,
+   "feed": 1,
+   "prod": "鹅蛋",
+   "cycle": 1,
+   "sell": 35
+  },
+  "pig": {
+   "n": "猪",
+   "ic": "🐷",
+   "price": 100,
+   "feed": 3,
+   "prod": "猪肉",
+   "cycle": 3,
+   "sell": 180
+  },
+  "cow": {
+   "n": "牛",
+   "ic": "🐮",
+   "price": 280,
+   "feed": 4,
+   "prod": "牛奶",
+   "cycle": 2,
+   "sell": 380
+  },
+  "sheep": {
+   "n": "羊",
+   "ic": "🐑",
+   "price": 160,
+   "feed": 3,
+   "prod": "羊毛",
+   "cycle": 2,
+   "sell": 240
+  }
+ },
+ "SHOP_TYPES": [
+  {
+   "id": "medical",
+   "n": "医馆",
+   "ic": "🏥",
+   "sk": "medicine",
+   "price": 3000
+  },
+  {
+   "id": "embroidery",
+   "n": "绣坊",
+   "ic": "🧵",
+   "sk": "embroidery",
+   "price": 2500
+  },
+  {
+   "id": "restaurant",
+   "n": "餐馆",
+   "ic": "🍜",
+   "sk": "cooking",
+   "price": 2000
+  },
+  {
+   "id": "gallery",
+   "n": "书斋",
+   "ic": "🖌️",
+   "sk": "painting",
+   "price": 2800
+  },
+  {
+   "id": "music",
+   "n": "乐坊",
+   "ic": "🎵",
+   "sk": "music",
+   "price": 3200
+  },
+  {
+   "id": "grocery",
+   "n": "杂货铺",
+   "ic": "🏪",
+   "sk": null,
+   "price": 1500
+  }
+ ],
+ "CHEAT_CHANCE": {
+  "guyan": 0.13,
+  "peijing": 0.15
+ },
+ "NPC_DEFS": {
+  "shenyan": {
+   "name": "沈砚",
+   "age": 22,
+   "sex": "m",
+   "title": "青衫书生",
+   "type": "warm",
+   "loyalty": 68,
+   "meetAt": "tea",
+   "minXun": 3
+  },
+  "lushian": {
+   "name": "陆时安",
+   "age": 24,
+   "sex": "m",
+   "title": "回春堂学徒",
+   "type": "warm",
+   "loyalty": 88,
+   "meetAt": "herb",
+   "minXun": 2
+  },
+  "afu": {
+   "name": "阿福",
+   "age": 19,
+   "sex": "m",
+   "title": "卖炊饼的少年",
+   "type": "warm",
+   "loyalty": 95,
+   "meetAt": "market",
+   "minXun": 2
+  },
+  "xiehuai": {
+   "name": "谢怀安",
+   "age": 25,
+   "sex": "m",
+   "title": "巡街捕快",
+   "type": "warm",
+   "loyalty": 72,
+   "meetAt": "maid",
+   "minXun": 6
+  },
+  "peijing": {
+   "name": "裴景行",
+   "age": 27,
+   "sex": "m",
+   "title": "绸缎庄少东家",
+   "type": "bad",
+   "loyalty": 20,
+   "meetAt": "silk",
+   "minXun": 8
+  },
+  "guyan": {
+   "name": "顾燕",
+   "age": 26,
+   "sex": "m",
+   "title": "赌坊常客",
+   "type": "bad",
+   "loyalty": 12,
+   "meetAt": "pawn",
+   "minXun": 9
+  },
+  "ataotao": {
+   "name": "阿桃",
+   "age": 20,
+   "sex": "f",
+   "title": "酒楼帮工",
+   "type": "warm",
+   "loyalty": 80,
+   "meetAt": "wash",
+   "minXun": 2
+  },
+  "liuniang": {
+   "name": "柳娘",
+   "age": 28,
+   "sex": "f",
+   "title": "布庄绣娘",
+   "type": "warm",
+   "loyalty": 85,
+   "meetAt": "embro",
+   "minXun": 3
+  }
+ },
+ "SPOUSE_INCOME": {
+  "shenyan": [
+   30,
+   80
+  ],
+  "lushian": [
+   40,
+   100
+  ],
+  "afu": [
+   50,
+   120
+  ],
+  "xiehuai": [
+   80,
+   160
+  ],
+  "peijing": [
+   200,
+   400
+  ],
+  "guyan": [
+   -120,
+   40
+  ]
+ },
+ "BOOKS": [
+  {
+   "n": "《妆台记》",
+   "price": 120,
+   "stat": "beauty",
+   "gain": 3,
+   "desc": "美貌 +3"
+  },
+  {
+   "n": "《京华见闻录》",
+   "price": 150,
+   "stat": "wisdom",
+   "gain": 3,
+   "desc": "智慧 +3"
+  },
+  {
+   "n": "《本草备要》",
+   "price": 180,
+   "stat": "medicine",
+   "gain": 5,
+   "desc": "医术 +5"
+  },
+  {
+   "n": "《绣谱》",
+   "price": 160,
+   "stat": "embroidery",
+   "gain": 5,
+   "desc": "绣花 +5"
+  },
+  {
+   "n": "《随园食单》",
+   "price": 140,
+   "stat": "cooking",
+   "gain": 5,
+   "desc": "厨艺 +5"
+  },
+  {
+   "n": "《百草辨识》",
+   "price": 100,
+   "stat": "gathering",
+   "gain": 5,
+   "desc": "采集 +5"
+  },
+  {
+   "n": "《山猎要术》",
+   "price": 200,
+   "stat": "hunting",
+   "gain": 5,
+   "desc": "狩猎 +5"
+  },
+  {
+   "n": "《农政全书》",
+   "price": 130,
+   "stat": "farming",
+   "gain": 5,
+   "desc": "农耕 +5"
+  },
+  {
+   "n": "《相牛经》",
+   "price": 130,
+   "stat": "husbandry",
+   "gain": 5,
+   "desc": "畜牧 +5"
+  },
+  {
+   "n": "《琴操》",
+   "price": 220,
+   "stat": "music",
+   "gain": 5,
+   "desc": "音律 +5"
+  },
+  {
+   "n": "《历代名画记》",
+   "price": 220,
+   "stat": "painting",
+   "gain": 5,
+   "desc": "书画 +5"
+  }
+ ],
+ "SEASONS": [
+  "春",
+  "夏",
+  "秋",
+  "冬"
+ ],
+ "SCHOOL_FEE": 400,
+ "FAME_MAX": 200,
+ "SAVE_SLOTS": 6,
+ "MEET_CHANCE": 0.9,
+ "NIGHT_ACTION_LIMIT": 4,
+ "TOTAL_ACTIONS": 8,
+ "WEDDING_COST": 5000,
+ "SHOP_MAX_LEVEL": 10,
+ "FOODS": [
+  {
+   "n": "馒头",
+   "price": 4,
+   "hung": 16,
+   "stam": 0
+  },
+  {
+   "n": "阳春面",
+   "price": 11,
+   "hung": 32,
+   "stam": 3
+  },
+  {
+   "n": "酱牛肉",
+   "price": 28,
+   "hung": 48,
+   "stam": 8
+  },
+  {
+   "n": "席面",
+   "price": 88,
+   "hung": 70,
+   "stam": 16
+  }
+ ]
+}

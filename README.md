@@ -9,6 +9,7 @@
 | [`research-story-writing/`](research-story-writing/) | 科研论文 / 学位论文 / final report 多 agent 写作工作流（故事优先、LaTeX 直写、规则配置、claim 登记、分节派发与冷读验收、事实审计、去 AI 腔、对抗审查） | 写或改论文、章节、课程 final report；提到合著者写作、storyline、去 AI 腔 |
 | [`report_style_guide.md`](report_style_guide.md) | 实验报告整理风格指南（表格叙事、设定→表→发现） | 重写/新写实验报告，要短、结构化、少 prose |
 | [`paper-figure/`](paper-figure/) | AI 论文作图，以 PPT 为主：用 python-pptx 原生形状画可编辑的架构图、机制图，数据图用 matplotlib 出图后插入；遵守 6 条作图规则（结构不写句子、灰底高亮创新点、Inter 三档字号、形状线条统一、只用 2–4 种颜色、留白）；渲染自查并自动审计 | 画、改、审论文图；提到论文作图、架构图、teaser、配色、图的风格 |
+| [`wenyou-dangan/`](wenyou-dangan/)（文游档案） | 手机 HTML 文字游戏的设计知识库，加上每个游戏一个档案工作区，当作跨会话的外部记忆：用户的设计理念、方法库（技术骨架、系统模式卡、主线与台词、数值物价、贴图音乐）、档案（分篇分析、JSON 数据、抽数和算数脚本、维护日志） | 拆解参考游戏、设计或开发新文游（女性向、经营养成）、定数值物价、写主线和角色；提到文游档案、文游、女性向游戏 |
 
 ## 安装到 Cursor
 
@@ -34,6 +35,7 @@ cp -R -skill/research-story-writing /path/to/your-repo/.cursor/skills/
 
 ```bash
 ln -s "$PWD/-skill/paper-figure" ~/.claude/skills/paper-figure
+ln -s "$PWD/-skill/wenyou-dangan" ~/.claude/skills/wenyou-dangan
 ```
 
 `paper-figure` 还依赖以下工具：
@@ -68,6 +70,14 @@ ln -s "$PWD/-skill/paper-figure" ~/.claude/skills/paper-figure
 - 「用 paper-figure 审一下这份 pptx 的图」
 
 论文相关的信息写在 `paper-figure/projects/<论文>.md`，这个文件只留在本地，已加入 .gitignore，因为它含有未发表的内容。
+
+`wenyou-dangan` 可以自动触发，也可以点名，例如：
+
+- 「用文游档案拆解一下这个小游戏」
+- 「读文游档案，续做京城生存挑战的档案」
+- 「按文游档案给新作立项，先填主线节拍表」
+
+入口说明见 [`wenyou-dangan/SKILL.md`](wenyou-dangan/SKILL.md)，档案登记表见 [`wenyou-dangan/games/INDEX.md`](wenyou-dangan/games/INDEX.md)。参考作品的原文、代码和素材链接不进仓库，只放梗概和数值。
 
 ## 新增 skill 约定
 
