@@ -204,3 +204,9 @@ node 里截出这一段，用 `vm.runInNewContext(model + ';({gather, endDay, �
 
 - **Artifact（试玩链接）**：源文件不写 `<!doctype>`、`<html>`、`<head>`、`<body>`，发布时平台会自动包一层；文件开头直接写 `<title>`、`<style>`。本地存储的读写都包上 try/catch；没有 `alert` / `confirm`，确认都做成弹窗。
 - **独立版（发给玩家）**：用档案里的 `tools/build.sh` 补上 doctype、head、viewport，生成可以双击打开的文件。Google Fonts 在国内可能加载不到，字体栈要以系统楷体、宋体兜底。
+- **公开链接（GitHub Pages）**：独立版放进 `Tonkmy/bin` 仓库的 `<slug>/index.html`，再在根目录 `index.html` 的目录里加一条；仓库 README 里写了步骤。地址是 `https://tonkmy.github.io/bin/<slug>/`。
+
+## 15. 上线前必查
+
+- **外部字体用脚本异步加载**，不要用 `<link rel="stylesheet">` 直接写在 head 里。国内连不上 Google Fonts 时，阻塞式加载会让页面白屏很久。Canvas 上用到的字体，要监听 `document.fonts` 的 `loadingdone` 事件，加载完再重画一遍。
+- **存档键名加游戏前缀**：`tonkmy.github.io` 下所有游戏共用一份 localStorage，键名重复会互相覆盖存档。
